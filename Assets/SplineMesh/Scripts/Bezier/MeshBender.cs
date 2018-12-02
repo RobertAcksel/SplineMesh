@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 /// <summary>
 /// A component that create a deformed mesh from a given one, according to a cubic Bézier curve and other parameters.
-/// The mesh will always be bended along the X axis. Extreme X coordinates of source mesh verticies will be used as a bounding to the deformed mesh.
+/// The mesh will always be bended along the Z axis. Extreme Z coordinates of source mesh verticies will be used as a bounding to the deformed mesh.
 /// The resulting mesh is stored in a MeshFilter component and automaticaly updated each time the cubic Bézier curve control points are changed.
 /// </summary>
 [DisallowMultipleComponent]
@@ -19,11 +19,12 @@ public class MeshBender : MonoBehaviour
     private Quaternion sourceRotation;
     private Vector3 sourceTranslation;
 
-    public CubicBezierCurve curve;
+    public ICurve curve;
     private float startScale = 1, endScale = 1;
     private float startRoll, endRoll;
+	private Transform referencetransfrom;
 
-    private void OnEnable() {
+	private void OnEnable() {
         result = new Mesh();
         GetComponent<MeshFilter>().sharedMesh = result;
     }
@@ -33,7 +34,7 @@ public class MeshBender : MonoBehaviour
     /// </summary>
     /// <param name="curve"></param>
     /// <param name="update">If let to true, update the resulting mesh immediatly.</param>
-    public void SetCurve(CubicBezierCurve curve, bool update = true)
+    public void SetCurve(ICurve curve, bool update = true)
     {
         if(this.curve != null) {
             this.curve.Changed.RemoveListener(() => Compute());
@@ -132,7 +133,7 @@ public class MeshBender : MonoBehaviour
         if (source == null)
             return;
         int nbVert = source.vertices.Length;
-        // find the bounds along x
+        // find the bounds along z
         float minX = float.MaxValue;
         float maxX = float.MinValue;
         foreach (Vertex vert in vertices) {
@@ -143,14 +144,14 @@ public class MeshBender : MonoBehaviour
             if(sourceTranslation != Vector3.zero) {
                 p += sourceTranslation;
             }
-            maxX = Math.Max(maxX, p.x);
-            minX = Math.Min(minX, p.x);
+            maxX = Math.Max(maxX, p.z);
+            minX = Math.Min(minX, p.z);
         }
         float length = Math.Abs(maxX - minX);
 
         List<Vector3> deformedVerts = new List<Vector3>(nbVert);
         List<Vector3> deformedNormals = new List<Vector3>(nbVert);
-        // for each mesh vertex, we found its projection on the curve
+        // for each mesh vertex, we have to find its projection on the curve
         foreach (Vertex vert in vertices) {
             Vector3 p = vert.v;
             Vector3 n = vert.n;
@@ -162,11 +163,12 @@ public class MeshBender : MonoBehaviour
             if (sourceTranslation != Vector3.zero) {
                 p += sourceTranslation;
             }
-            float distanceRate = Math.Abs(p.x - minX) / length;
+            float distanceRate = Math.Abs(p.z - minX) / length;
 
-            Vector3 curvePoint = curve.GetLocationAtDistance(curve.Length * distanceRate);
+	        Vector3 curvePoint = curve.GetLocationAtDistance(curve.Length * distanceRate);
+//            Vector3 curvePoint = transform.InverseTransformVector(curve.GetLocationAtDistance(curve.Length * distanceRate));
             Vector3 curveTangent = curve.GetTangentAtDistance(curve.Length * distanceRate);
-            Quaternion q = CubicBezierCurve.GetRotationFromTangent(curveTangent) * Quaternion.Euler(0, -90, 0);
+	        Quaternion q = CubicBezierCurve.GetRotationFromTangent(curveTangent);
 
             // application of scale
             float scaleAtDistance = startScale + (endScale - startScale) * distanceRate;
@@ -177,10 +179,18 @@ public class MeshBender : MonoBehaviour
             p = Quaternion.AngleAxis(rollAtDistance, Vector3.right) * p;
             n = Quaternion.AngleAxis(rollAtDistance, Vector3.right) * n;
 
-            // reset X value of p
-            p = new Vector3(0, p.y, p.z);
+            // reset Z value of p
+            p = new Vector3(p.x, p.y, 0);
 
-            deformedVerts.Add(q * p + curvePoint);
+		    Vector3 fvert = q * p + curvePoint;
+//	        if (referencetransfrom) {
+//		        fvert = q * p + curvePoint;
+//		        fvert = transform.TransformPoint(referencetransfrom.InverseTransformPoint(fvert));
+//	        } else {
+//		        fvert = q * p + curvePoint;
+//		        fvert = transform.TransformPoint(transform.InverseTransformPoint(fvert));
+//	        }
+	        deformedVerts.Add(fvert);
             deformedNormals.Add(q * n);
         }
 
@@ -197,7 +207,13 @@ public class MeshBender : MonoBehaviour
     }
 
     private void OnDestroy() {
-        curve.Changed.RemoveListener(() => Compute());
+        curve?.Changed.RemoveListener(() => Compute());
     }
 
+	public void SetReferenceTransfrom(Transform reference, bool updateMesh) {
+		referencetransfrom = reference;
+		if (updateMesh) {
+			Compute();
+		}
+	}
 }

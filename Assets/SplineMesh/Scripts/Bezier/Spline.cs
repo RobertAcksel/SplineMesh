@@ -13,7 +13,7 @@ using UnityEngine.Events;
 /// </summary>
 [DisallowMultipleComponent]
 [ExecuteInEditMode]
-public class Spline : MonoBehaviour {
+public class Spline : MonoBehaviour, ICurve {
     /// <summary>
     /// The spline nodes.
     /// Warning, this collection shouldn't be changed manualy. Use specific methods to add and remove nodes.
@@ -121,6 +121,23 @@ public class Spline : MonoBehaviour {
         return res;
     }
 
+	public CubicBezierCurve GetCurveAtDistance(float d) {
+		if (d < 0 || d > Length)
+			throw new ArgumentException(string.Format("Distance must be between 0 and spline length ({0}). Given distance was {1}.", Length, d));
+		for (var i = 0; i < curves.Count; i++) {
+			CubicBezierCurve curve = curves[i];
+			if (d > curve.Length) {
+				if (i == curves.Count -1) {
+					return curve;
+				}
+				d -= curve.Length;
+			} else {
+				return curve;
+			}
+		}
+		throw new Exception("Something went wrong with GetTangentAlongSplineAtDistance");
+	}
+
     /// <summary>
     /// Returns the point on spline at distance. Distance must be between 0 and spline length.
     /// </summary>
@@ -128,15 +145,20 @@ public class Spline : MonoBehaviour {
     /// <returns></returns>
     public Vector3 GetLocationAlongSplineAtDistance(float d) {
         if(d < 0 || d > Length)
-            throw new ArgumentException(string.Format("Distance must be between 0 and spline length ({0}). Given distance was {1}.", Length, d));
-        foreach (CubicBezierCurve curve in curves) {
-            if (d > curve.Length) {
-                d -= curve.Length;
-            } else {
-                return curve.GetLocationAtDistance(d);
-            }
-        }
-        throw new Exception("Something went wrong with GetLocationAlongSplineAtDistance");
+            throw new ArgumentException($"Distance must be between 0 and spline length ({Length}). Given distance was {d}.");
+	    for (var i = 0; i < curves.Count; i++) {
+		    CubicBezierCurve curve = curves[i];
+		    if (d > curve.Length) {
+			    if (i == curves.Count -1) {
+				    return curve.GetLocationAtDistance(curve.Length);
+			    }
+
+			    d -= curve.Length;
+		    } else {
+			    return curve.GetLocationAtDistance(d);
+		    }
+	    }
+	    throw new Exception("Something went wrong with GetLocationAlongSplineAtDistance");
     }
 
     /// <summary>
@@ -147,14 +169,18 @@ public class Spline : MonoBehaviour {
     public Vector3 GetTangentAlongSplineAtDistance(float d) {
         if (d < 0 || d > Length)
             throw new ArgumentException(string.Format("Distance must be between 0 and spline length ({0}). Given distance was {1}.", Length, d));
-        foreach (CubicBezierCurve curve in curves) {
-            if (d > curve.Length) {
-                d -= curve.Length;
-            } else {
-                return curve.GetTangentAtDistance(d);
-            }
-        }
-        throw new Exception("Something went wrong with GetTangentAlongSplineAtDistance");
+	    for (var i = 0; i < curves.Count; i++) {
+		    CubicBezierCurve curve = curves[i];
+		    if (d > curve.Length) {
+			    if (i == curves.Count -1) {
+				    return curve.GetTangentAtDistance(curve.Length);
+			    }
+			    d -= curve.Length;
+		    } else {
+			    return curve.GetTangentAtDistance(d);
+		    }
+	    }
+	    throw new Exception("Something went wrong with GetTangentAlongSplineAtDistance");
     }
 
     /// <summary>
@@ -223,4 +249,11 @@ public class Spline : MonoBehaviour {
         RaiseNodeCountChanged();
         UpdateAfterCurveChanged();
     }
+
+	Vector3 ICurve.GetLocationAtTime(float t) => GetLocationAlongSpline(t);
+	Vector3 ICurve.GetTangentAtTime(float t) => GetTangentAlongSpline(t);
+	Vector3 ICurve.GetLocationAtDistance(float d) => GetLocationAlongSplineAtDistance(d);
+	Vector3 ICurve.GetTangentAtDistance(float d) => GetTangentAlongSplineAtDistance(d);
+	UnityEvent ICurve.Changed => CurveChanged;
+	float ICurve.Length => Length;
 }

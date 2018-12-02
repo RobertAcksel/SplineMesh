@@ -64,19 +64,16 @@ public class ExempleSower : MonoBehaviour {
         }
     }
 
-    public void Sow() {
-        foreach (GameObject go in prefabs) {
-            if (gameObject != null) {
-                if (Application.isPlaying) {
-                    Destroy(go);
-                } else {
-                    DestroyImmediate(go);
-                }
-            }
-        }
-        prefabs.Clear();
+	private void OnDisable()
+	{
+		Clear();
+	}
 
-        UnityEngine.Random.InitState(randomSeed);
+
+	public void Sow() {
+        Clear();
+
+		UnityEngine.Random.InitState(randomSeed);
         if (spacing + spacingRange <= 0 ||
             prefab == null)
             return;
@@ -98,8 +95,8 @@ public class ExempleSower : MonoBehaviour {
                 go.transform.Rotate(0, 0, UnityEngine.Random.Range(-180, 180));
             } else {
                 Vector3 horTangent = spline.GetTangentAlongSplineAtDistance(distance);
-                horTangent.y = 0;
-                go.transform.rotation = Quaternion.LookRotation(horTangent) * Quaternion.LookRotation(Vector3.left, Vector3.up);
+//                horTangent.y = 0;
+                go.transform.rotation = Quaternion.LookRotation(horTangent) * Quaternion.LookRotation(Vector3.forward, Vector3.up);
             }
             // move orthogonaly to the spline, according to offset + random
             Vector3 binormal = spline.GetTangentAlongSplineAtDistance(distance);
@@ -112,4 +109,17 @@ public class ExempleSower : MonoBehaviour {
             distance += spacing + UnityEngine.Random.Range(0, spacingRange);
         }
     }
+
+	private void Clear() {
+		foreach (GameObject go in prefabs) {
+			if (gameObject != null) {
+				if (Application.isPlaying) {
+					Destroy(go);
+				} else {
+					DestroyImmediate(go);
+				}
+			}
+		}
+		prefabs.Clear();
+	}
 }

@@ -12,7 +12,7 @@ using UnityEngine.Events;
 /// Note that a time of 0.5 and half the total distance won't necessarily define the same curve point as the curve curvature is not linear.
 /// </summary>
 [Serializable]
-public class CubicBezierCurve {
+public class CubicBezierCurve : ICurve {
 
     private const int STEP_COUNT = 30;
     private const float T_STEP = 1.0f/STEP_COUNT;
@@ -28,7 +28,10 @@ public class CubicBezierCurve {
     /// <summary>
     /// This event is raised when of of the control points has moved.
     /// </summary>
-    public UnityEvent Changed = new UnityEvent();
+	[SerializeField]
+    private UnityEvent changed = new UnityEvent();
+
+	public UnityEvent Changed => changed;
 
     /// <summary>
     /// Build a new cubic Bézier curve between two given spline node.
@@ -167,12 +170,16 @@ public class CubicBezierCurve {
         return res;
     }
 
-    /// <summary>
+	Vector3 ICurve.GetLocationAtTime(float t) => GetLocation(t);
+
+	Vector3 ICurve.GetTangentAtTime(float t) => GetTangent(t);
+	/// <summary>
     /// Returns point on curve at distance. Distance must be between 0 and curve length.
     /// </summary>
     /// <param name="d"></param>
     /// <returns></returns>
-    public Vector3 GetLocationAtDistance(float d) {
+    public Vector3 GetLocationAtDistance(float d) 
+	{
         return getCurvePointAtDistance(d).location;
     }
 
@@ -186,8 +193,8 @@ public class CubicBezierCurve {
         return getCurvePointAtDistance(d).tangent;
     }
 
-    private class CurveSample
-    {
+	private class CurveSample
+	{
         public Vector3 location;
         public Vector3 tangent;
         public float distance;

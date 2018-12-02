@@ -44,18 +44,9 @@ public class ExemplePipe : MonoBehaviour {
     }
 
     public void CreateMeshes() {
-        foreach(GameObject go in meshes) {
-            if(gameObject != null) {
-                if (Application.isPlaying) {
-                    Destroy(go);
-                } else {
-                    DestroyImmediate(go);
-                }
-            }
-        }
-        meshes.Clear();
+        Clear();
 
-        int i = 0;
+	    int i = 0;
         foreach (CubicBezierCurve curve in spline.GetCurves()) {
             GameObject go = new GameObject("SplineMesh" + i++, typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshBender), typeof(MeshCollider));
             go.transform.parent = transform;
@@ -74,4 +65,24 @@ public class ExemplePipe : MonoBehaviour {
             meshes.Add(go);
         }
     }
+
+	private void Clear() {
+		foreach (GameObject go in meshes) {
+			if (gameObject != null) {
+				if (Application.isPlaying) {
+					Destroy(go);
+				} else {
+					DestroyImmediate(go);
+				}
+			}
+		}
+		meshes.Clear();
+	}
+
+	private void OnDisable()
+	{
+		Clear();
+	}
+
+
 }
