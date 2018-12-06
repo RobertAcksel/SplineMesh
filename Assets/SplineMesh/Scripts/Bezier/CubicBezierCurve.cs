@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+namespace SplineMesh {
 /// <summary>
 /// Mathematical object for cubic Bézier curve definition.
 /// It is made of two spline nodes which hold the four needed control points : two positions and two directions
@@ -210,4 +211,5 @@ public class CubicBezierCurve : ICurve {
             return Quaternion.identity;
         return Quaternion.LookRotation(Tangent, Vector3.Cross(Tangent, Vector3.Cross(Vector3.up, Tangent).normalized));
     }
+}
 }

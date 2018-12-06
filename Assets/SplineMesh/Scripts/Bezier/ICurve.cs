@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
+namespace SplineMesh {
 public interface ICurve {
 	/// <summary>
 	/// Returns point on curve at given time. Time must be between 0 and 1.
@@ -39,4 +40,5 @@ public interface ICurve {
 	/// Length of the curve in world unit.
 	/// </summary>
 	float Length { get; }
+}	
 }

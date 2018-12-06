@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using UnityEngine;
 using UnityEngine.Events;
 
+namespace SplineMesh {
 /// <summary>
 /// A curved line made of oriented nodes.
 /// Each segment is a cubic Bézier curve connected to spline nodes.
@@ -256,4 +257,5 @@ public class Spline : MonoBehaviour, ICurve {
 	Vector3 ICurve.GetTangentAtDistance(float d) => GetTangentAlongSplineAtDistance(d);
 	UnityEvent ICurve.Changed => CurveChanged;
 	float ICurve.Length => Length;
+}
 }

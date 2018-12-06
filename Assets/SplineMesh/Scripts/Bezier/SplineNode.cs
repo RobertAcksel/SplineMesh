@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+namespace SplineMesh {
 /// <summary>
 /// Spline node storing a position and a direction (tangent).
 /// Note : you shouldn't modify position and direction manualy but use dedicated methods instead, to insure event raising.
@@ -61,4 +62,5 @@ public class SplineNode {
     /// </summary>
     [HideInInspector]
     public UnityEvent Changed = new UnityEvent();
+}	
 }

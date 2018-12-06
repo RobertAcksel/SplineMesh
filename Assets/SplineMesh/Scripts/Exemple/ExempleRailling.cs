@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace SplineMesh.Examples {
 /// <summary>
 /// Exemple of component to bend a mesh along a spline with an offset.
 /// 
@@ -77,4 +78,5 @@ public class ExempleRailling : MonoBehaviour {
             meshes.Add(go);
         }
     }
+}
 }

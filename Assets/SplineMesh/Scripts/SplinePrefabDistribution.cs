@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SplineMesh;
 using UnityEngine;
 using UnityEngine.Events;
 
+namespace DigitalLab.SplineMesh {
 [ExecuteInEditMode]
 [SelectionBase]
 public class SplinePrefabDistribution : MonoBehaviour {
@@ -19,7 +21,7 @@ public class SplinePrefabDistribution : MonoBehaviour {
 	public List<GameObject> spawnedGos = new List<GameObject>();
 
 	private Spline spline = null;
-	private bool toUpdate = true;
+	public bool ToUpdate = true;
 	[SerializeField]
 	private Data SpawnData;
 //	[SerializeField]
@@ -58,13 +60,12 @@ public class SplinePrefabDistribution : MonoBehaviour {
 		if (!Application.isPlaying) {
 			spline = GetComponent<Spline>();
 			spline.NodeCountChanged.AddListener(() => {
-				toUpdate = true;
 				foreach (CubicBezierCurve curve in spline.GetCurves()) {
-					curve.Changed.AddListener(() => toUpdate = true);
+					curve.Changed.AddListener(() => ToUpdate = true);
 				}
 			});
 			foreach (CubicBezierCurve curve in spline.GetCurves()) {
-				curve.Changed.AddListener(() => toUpdate = true);
+				curve.Changed.AddListener(() => ToUpdate = true);
 			}
 		}
 	}
@@ -92,24 +93,28 @@ public class SplinePrefabDistribution : MonoBehaviour {
 	}
 
 #if UNITY_EDITOR
-	[ContextMenu(nameof(ClearChilds))]
-	public void ClearChilds() {
+	[ContextMenu(nameof(ClearChildren))]
+	public void ClearChildren() {
 		int childCount = transform.childCount;
 		for (int i = 0; i < childCount; i++) {
 			GameObject.DestroyImmediate(transform.GetChild(0).gameObject);
 		}
 	}
 
+	[ContextMenu(nameof(RebuildTrack))]
+	public void RebuildTrack() {
+		ToUpdate = true;
+	}
+
 	private void OnValidate() {
-		toUpdate = true;
 		AnalyzePrefab();
 	}
 
 	private void Update() {
 		if (!Application.isPlaying) {
-			if (toUpdate) {
+			if (ToUpdate) {
 				Sow();
-				toUpdate = false;
+				ToUpdate = false;
 			}
 		}
 	}
@@ -243,4 +248,5 @@ public class SplinePrefabDistribution : MonoBehaviour {
 		}
 		spawnedGos.Clear();
 	}
+}	
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+namespace SplineMesh {
 [CustomEditor(typeof(Spline))]
 public class SplineEditor : Editor {
-
     private const int QUAD_SIZE = 12;
     private Color CURVE_COLOR = new Color(0.8f, 0.8f, 0.8f);
     private Color CURVE_BUTTON_COLOR = new Color(0.8f, 0.8f, 0.8f);
@@ -201,4 +201,5 @@ public class SplineEditor : Editor {
     public static void CreateSpline() {
         new GameObject("Spline", typeof(Spline));
     }
+}
 }

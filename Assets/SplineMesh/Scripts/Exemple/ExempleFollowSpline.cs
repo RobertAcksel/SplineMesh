@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+namespace SplineMesh.Examples {
 /// <summary>
 /// Exemple of component to show that the spline is an independant mathematical component and can be used for other purposes than mesh deformation.
 /// 
@@ -57,4 +58,5 @@ public class ExempleFollowSpline : MonoBehaviour {
             go.transform.localRotation = CubicBezierCurve.GetRotationFromTangent(spline.GetTangentAlongSpline(rate));
         }
     }
+}
 }

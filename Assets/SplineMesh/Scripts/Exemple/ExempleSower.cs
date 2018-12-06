@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace SplineMesh.Examples {
 /// <summary>
 /// Exemple of component to places assets along a spline. This component can be used as-is but will most likely be a base for your own component.
 /// 
@@ -122,4 +123,5 @@ public class ExempleSower : MonoBehaviour {
 		}
 		prefabs.Clear();
 	}
+}
 }

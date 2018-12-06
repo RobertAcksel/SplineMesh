@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace SplineMesh.Examples {
 /// <summary>
 /// Special component to extrude shape along a spline.
 /// 
@@ -161,4 +162,5 @@ public class SplineExtrusion : MonoBehaviour {
             return rotation * dir;
         }
     }
+}
 }

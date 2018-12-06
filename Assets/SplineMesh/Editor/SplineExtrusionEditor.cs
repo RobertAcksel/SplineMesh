@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEditor;
 
+namespace SplineMesh.Examples {
 [CustomEditor(typeof(SplineExtrusion))]
 public class SplineExtrusionEditor : Editor
 {
@@ -152,5 +152,5 @@ public class SplineExtrusionEditor : Editor
 
         serializedObject.ApplyModifiedProperties();
     }
-
+}	
 }

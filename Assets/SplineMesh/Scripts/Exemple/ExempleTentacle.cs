@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+namespace SplineMesh.Examples {
 /// <summary>
 /// Exemple of component to bend a mesh along a spline with some interpolation of scales and rolls. This component can be used as-is but will most likely be a base for your own component.
 /// 
@@ -85,4 +86,5 @@ public class ExempleTentacle : MonoBehaviour {
             meshes.Add(go);
         }
     }
+}	
 }
